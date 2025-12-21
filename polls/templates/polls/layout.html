@@ -1,0 +1,93 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Django + Tailwind CSS</title>
+
+    <link rel="stylesheet" href="{% static 'css/output.css' %}" />
+  </head>
+
+  <body>
+    <div class="header">
+      <header class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between items-center h-16">
+            <div class="flex items-center">
+              <img
+                src="../../../static/images/logo.webp"
+                alt="logo"
+                class="w-[100px]"
+              />
+            </div>
+            <nav class="hidden md:flex space-x-8">
+              <a href="#" class="block text-gray-600 hover:text-gray-900">
+                Image Converter
+              </a>
+              <a href="#" class="block text-gray-600 hover:text-gray-900">
+                Text Cleaner
+              </a>
+              <a href="#" class="block text-gray-600 hover:text-gray-900">
+                Grammar Corrector
+              </a>
+              <a href="#" class="block text-gray-600 hover:text-gray-900">
+                Text Uniqueness
+              </a>
+              <a href="#" class="block text-gray-600 hover:text-gray-900">
+                File Processing
+              </a>
+            </nav>
+            <div class="md:hidden">
+              <button id="menu-btn" class="text-gray-700 focus:outline-none">
+                <svg
+                  class="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
+          <nav class="px-4 py-4 space-y-3">
+            <a href="#" class="block text-gray-600 hover:text-gray-900">
+              Image Converter
+            </a>
+            <a href="#" class="block text-gray-600 hover:text-gray-900">
+              Text Cleaner
+            </a>
+            <a href="#" class="block text-gray-600 hover:text-gray-900">
+              Grammar Corrector
+            </a>
+            <a href="#" class="block text-gray-600 hover:text-gray-900">
+              Text Uniqueness
+            </a>
+            <a href="#" class="block text-gray-600 hover:text-gray-900">
+              File Processing
+            </a>
+          </nav>
+        </div>
+      </header>
+    </div>
+    {% block content %} {% endblock content %}
+    <script>
+      const btn = document.getElementById('menu-btn');
+      const menu = document.getElementById('mobile-menu');
+
+      btn.addEventListener('click', () => {
+        menu.classList.toggle('hidden');
+      });
+    </script>
+  </body>
+</html>

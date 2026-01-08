@@ -1,1 +1,78 @@
-{% extends 'polls/layout.html' %} {% block content %} {% endblock content %}
+{% extends 'polls/layout.html' %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+    <h1 class="text-center pt-4 text-3xl mb-10">Image Converter</h1>
+    <div id="drop-area"
+        class="w-full max-w-xl border-4 border-dashed border-gray-300 p-8 mb-4 bg-white rounded text-center">
+        <p class="mb-2 text-gray-600">Drag and drop images here or click the button to select files</p>
+        <input type="file" id="fileElem" class="hidden" multiple accept="image/*" onchange="handleFiles(this.files)">
+        <button class="bg-blue-700 text-white px-4 py-2 rounded"
+            onclick="document.getElementById('fileElem').click()">Select from device</button>
+        <ul id="file-list" class="file-list mt-4"></ul>
+    </div>
+    <button id="generate-pdf" class="bg-blue-700 text-white px-4 py-2 rounded mb-4" onclick="generatePDF()">Generate
+        PDF</button>
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+</div>
+<script>
+    let files = [];
+    function handleFiles(selectedFiles) {
+        const fileList = document.getElementById('file-list')
+        fileList.innerHTML = '';
+
+        for (let i = 0; i < selectedFiles.length; i++) {
+            files.push(selectedFiles[i])
+            const li = document.createElement('li');
+            li.textContent = selectedFiles[i].name;
+            fileList.appendChild(li)
+        }
+    }
+
+    function generatePDF() {
+        if (files.length === 0) {
+            alert('Please select some images first!')
+            return;
+        }
+
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const formData = new FormData();
+        files.forEach((file, index) => {
+            formData.append('file', file)
+        })
+        fetch('/upload/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': csrfToken
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/file_generation_in_progress'
+                }
+                else {
+                    alert('PDF generation failed.')
+                }
+            })
+            .catch(err => {
+                alert("Error generating PDF, check console")
+                console.log("Error PDF: ", err)
+            })
+    }
+    document.getElementById('drop-area').addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        e.dataTransfer.dropEffect = 'copy'
+    })
+    document.getElementById('drop-area').addEventListener('drop', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        handleFiles(files)
+    })
+</script>
+
+{% endblock content %}

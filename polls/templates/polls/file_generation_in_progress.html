@@ -1,0 +1,14 @@
+{% extends 'polls/layout.html' %}
+
+{% block content %}
+<div>
+    <h1>PDF Generation In Progress</h1>
+    <p>
+        Please wait while your PDF is being generated.
+    </p>
+    <p>
+        If you are not redirected automatically,
+        <a href="{% url 'get_generated_file' %}">click here</a>.
+    </p>
+</div>
+{% endblock content %}

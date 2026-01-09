@@ -4,6 +4,7 @@ import os
 from django.conf import settings
 from .tasks import convert_images_to_pdf_task
 from celery.result import AsyncResult
+from cleantext import clean
 
 # Create your views here.
 
@@ -51,3 +52,31 @@ def get_generated_file(request):
         return redirect(pdf_url)
     else:
         return render(request, 'polls/file_generation_in_progress.html') 
+    
+def get_text_cleaner(request):
+    return render(request, 'polls/text_cleaner.html')
+
+def clean_text(request):
+    if request.method == 'POST':
+        text = request.POST.get('text')
+        if not text: 
+            return JsonResponse({'result': False, 'error': 'Invalid request method'})
+        
+        cleaned_text = clean(text,
+            fix_unicode=True,       
+            to_ascii=True,         
+            lower=True,              
+            no_line_breaks=False,   
+            no_urls=True,         
+            no_emails=False,        
+            no_phone_numbers=False, 
+            no_numbers=False,
+            no_digits=False,
+            no_currency_symbols=False,
+            no_punct=False
+        )
+        return JsonResponse({'result': True, 'cleaned_text': cleaned_text})
+    return JsonResponse({
+        'result': False,
+        'error': 'Invalid request method'
+    }, status=405)

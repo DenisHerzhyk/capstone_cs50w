@@ -1,69 +1,60 @@
-{% extends 'polls/layout.html' %}
-
-{% block content %}
+{% extends 'polls/layout.html' %} {% block content %}
 <div class="mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center mt-7">
-    <h1 class="text-center text-3xl mb-10 underline decoration-red-400">Text Cleaner</h1>
-    <form method="POST" class="max-w-7xl w-full form-control px-4 py-2" id="form">
-        {% csrf_token %}
-        <textarea id="text" name="text" class="w-full form-control px-4 py-2"
-            style="height: 320px; border: 1px solid rgba(182, 182, 182, 0.51)"
-            placeholder="Copy and paste your text here, change the settings below and click the clean button."></textarea>
-        <button id="text-clean" class="bg-blue-700 text-white px-4 py-2 rounded mb-4 mt-4">Clean Text</button>
-    </form>
+  <h1 class="text-center text-3xl mb-10 underline decoration-blue-400">
+    Text Cleaner
+  </h1>
+  <form method="POST" class="max-w-7xl w-full form-control px-4 py-2" id="form">
+    {% csrf_token %}
+    <textarea
+      id="text"
+      name="text"
+      class="w-full form-control px-4 py-2 rounded-md"
+      style="height: 320px; border: 1px solid rgba(182, 182, 182, 0.51)"
+      placeholder="Copy and paste your text here and click the clean button."
+    ></textarea>
+    <button
+      id="text-clean"
+      class="bg-blue-400 text-white px-4 py-2 rounded mb-4 mt-4"
+    >
+      Clean Text
+    </button>
+  </form>
 
-    <div class="max-w-7xl w-full mt-10 hidden" id="result-box">
-        <h2>Result: </h2>
-        <p class="text-base" id="cleaned_text"></p>
-    </div>
-    <!-- <div class="flex flex-col max-w-7xl w-full">
-        <h2 class="mb-4 text-xl">Clean Text</h2>
-        <div class="whitespace flex flex-col gap-2">
-            <h3 class="mb-2 text-gray-600">Whitespaces</h3>
-            <div class="checkbox">
-                <input type="checkbox" id="trim_yes">
-                <label for="trim_yes">Trim</label>
-            </div>
-            <div class="checkbox">
-                <input type="checkbox" id="remove_leading_spaces_yes">
-                <label for="remove_leading_spaces_yes">Remove leading spaces</label>
-            </div>
-            <div class="checkbox">
-                <input type="checkbox" id="remove_trailing_spaces_yes">
-                <label for="remove_trailing_spaces_yes">Remove trailing spaces</label>
-            </div>
-        </div>
-    </div> -->
+  <div class="max-w-7xl w-full mt-10 hidden px-4 py-2" id="result-box">
+    <h2 class="text-xl font-semibold">Result:</h2>
+    <p
+      class="text-base mt-4 bg-gray-100 px-4 py-2 rounded-md border-gray-300"
+      id="correct_text"
+    ></p>
+  </div>
 </div>
 <script>
-    const form = document.getElementById('form');
+  const form = document.getElementById("form");
 
-    form.addEventListener('submit', (e) => {
-        e.preventDefault()
-        const formData = new FormData(form)
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const formData = new FormData(form);
 
-        fetch('/clean/', {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.result) {
-                    document.getElementById('cleaned_text').innerText = data.cleaned_text;
-                    const resultBox = document.getElementById('result-box');
-                    resultBox.classList.remove('hidden')
-                    resultBox.classList.add('flex', 'flex-col')
-                    console.log("We are in data:", data.result)
-                }
-                else {
-                    alert(data.error)
-                }
-            })
-            .catch(err => {
-                alert("Error cleaning your text, check console")
-                console.log("Error text cleaning: ", err)
-            })
-
+    fetch("/clean/", {
+      method: "POST",
+      body: formData,
     })
-
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.result) {
+          document.getElementById("correct_text").innerText = data.correct_text;
+          const resultBox = document.getElementById("result-box");
+          resultBox.classList.remove("hidden");
+          resultBox.classList.add("flex", "flex-col");
+          console.log("We are in data:", data.result);
+        } else {
+          alert(data.error);
+        }
+      })
+      .catch((err) => {
+        alert("Error cleaning your text, check console");
+        console.log("Error text cleaning: ", err);
+      });
+  });
 </script>
 {% endblock %}

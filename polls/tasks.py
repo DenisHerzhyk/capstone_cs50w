@@ -5,6 +5,7 @@ from django.conf import settings
 from PIL import Image
 
 ALLOWED_EXTENSIONS = ['tiff', 'tif', 'pdf', 'png']
+pdf_path = None
 
 @shared_task
 def convert_images_to_pdf_task(file_paths):
@@ -20,8 +21,12 @@ def convert_images_to_pdf_task(file_paths):
     pdf_output_path = os.path.join(settings.MEDIA_ROOT, 'pdfs', 'output.pdf')
     os.makedirs(os.path.dirname(pdf_output_path), exist_ok=True)
     pdf.output(pdf_output_path)
+    pdf_path = pdf_output_path
     return pdf_output_path
     
+
+# @shared_task
+# def edit_pdf_task(file_paths):
 
 
 @shared_task

@@ -106,11 +106,10 @@ def get_generated_file(request):
 
     if task_result.status == 'SUCCESS' and os.path.exists(output_path):
         return redirect(file_url)
+
+    return render(request, 'polls/file_generation_in_progress.html')
     
-    if action == 'generate-pdf':
-        return render(request, 'polls/file_generation_in_progress.html')
-    
-    return render(request, 'polls/edit_pdf.html')
+    # return render(request, 'polls/edit_pdf.html')
 
 #clean text
 def clean_text(request):

@@ -12,5 +12,4 @@ urlpatterns = [
     #text_cleaner
     path('text_cleaner/', views.get_text_cleaner, name='get_text_cleaner'),
     path('clean/', views.clean_text, name='clean_text'),
-
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

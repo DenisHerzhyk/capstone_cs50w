@@ -21,6 +21,7 @@ def convert_images_to_pdf_task(file_paths):
     os.makedirs(os.path.dirname(pdf_output_path), exist_ok=True)
     pdf.output(pdf_output_path)
     return pdf_output_path
+    
 
 
 @shared_task

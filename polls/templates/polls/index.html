@@ -21,7 +21,7 @@
       onchange="handleFiles(this.files)"
     />
     <button
-      class="bg-blue-700 text-white px-4 py-2 rounded"
+      class="bg-red-500 text-white px-4 py-2 rounded"
       onclick="document.getElementById('fileElem').click()"
     >
       Select from device
@@ -40,6 +40,7 @@
       Generate PDF
     </div>
   </button>
+  <div id="pdf_pages" class="hidden"></div>
   <button
     id="generate-tiff"
     name="action"
@@ -93,7 +94,7 @@
     const formData = new FormData();
     formData.append("action", input_name);
     files.forEach((file, index) => {
-      formData.append("file", file);
+      formData.append("files[]", file);
     });
 
     fetch("/upload/", {
@@ -120,7 +121,40 @@
   };
 
   const generatePDF = () => {
-    generate("generate-pdf", "Error generating PDF");
+    if (files.length === 0) {
+      alert("Please select at least one image!");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("action", "pdf_edit");
+    files.forEach((file, index) => {
+      formData.append("file", file);
+    });
+
+    fetch("/upload-edit/", {
+      method: "POST",
+      body: formData,
+      headers: {
+        "CSRF-Token": document.querySelector("[name=csrfmiddlewaretoken]")
+          .value,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const pdf_pages_block = document.getElementById("pdf_pages");
+        pdf_pages_block.innerHTML = "";
+        pdf_pages_block.className = "flex";
+        // pdf_pages_block.classList.add = "flex";
+
+        data.files.forEach((file) => {
+          var div = document.createElement("div");
+
+          div.innerHTML = `<strong>${file.name} - [${file.pages}]</strong>`;
+          pdf_block.append(div);
+        });
+      });
+    // generate("generate-pdf", "Error generating PDF");
   };
 
   const generateTIFF = () => {

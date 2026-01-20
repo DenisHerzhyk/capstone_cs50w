@@ -7,6 +7,8 @@ from celery.result import AsyncResult
 from cleantext import clean
 import language_tool_python
 import re
+from pypdf import PdfReader
+from PIL import Image
 
 tool = language_tool_python.LanguageTool('en-US')
 
@@ -19,9 +21,34 @@ ALLOWED_TYPES = (
 def index(request):
     return render(request, "polls/index.html")
 
+def file_generation_in_progress(request):
+    return render(request, 'polls/file_generation_in_progress.html')
+
+def get_text_cleaner(request):
+    return render(request, 'polls/text_cleaner.html')
+
+def upload_edit(request):
+    files = request.FILES.getList('files[]')
+    result = []
+
+    for f in files:
+        if f.content_type == 'application/pdf':
+            reader = PdfReader(f)
+            pages = len(reader.pages)
+    
+        else:
+            im = Image.open(f)
+            pages = im.n_frames
+
+        result.append({
+            "name": f.name,
+            "pages": pages
+        })
+    return JsonResponse({'files': result})
+
 def upload_images(request):
     if request.method == "POST":
-        files = request.FILES.getlist('file')
+        files = request.FILES.getlist('files[]')   
         action = request.POST.get("action")
         if not files:
             return JsonResponse({'success': False, 'error': 'No file was uploaded'})
@@ -54,7 +81,7 @@ def upload_images(request):
         request.session['task_id'] = result.id  
         request.session['action'] = action      
         return JsonResponse({'success': True})
-
+        
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
 
@@ -79,17 +106,13 @@ def get_generated_file(request):
 
     if task_result.status == 'SUCCESS' and os.path.exists(output_path):
         return redirect(file_url)
-    else:
-        return render(request, 'polls/file_generation_in_progress.html') 
     
-
-def file_generation_in_progress(request):
-    return render(request, 'polls/file_generation_in_progress.html')
+    if action == 'generate-pdf':
+        return render(request, 'polls/file_generation_in_progress.html')
+    
+    return render(request, 'polls/edit_pdf.html')
 
 #clean text
-def get_text_cleaner(request):
-    return render(request, 'polls/text_cleaner.html')
-
 def clean_text(request):
     if request.method == 'POST':
         text = request.POST.get('text', '')

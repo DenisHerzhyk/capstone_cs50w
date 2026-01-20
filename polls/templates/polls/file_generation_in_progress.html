@@ -1,14 +1,11 @@
-{% extends 'polls/layout.html' %}
-
-{% block content %}
+{% extends 'polls/layout.html' %} {% block content %}
 <div>
-    <h1>File Generation In Progress</h1>
-    <p>
-        Please wait while your file is being generated.
-    </p>
-    <p>
-        If you are not redirected automatically,
-        <a href="{% url 'get_generated_file' %}">click here</a>.
-    </p>
+  <h1>File Generation In Progress</h1>
+  <p>Please wait while your file is being generated.</p>
+  <p>
+    If you are not redirected automatically,
+    <a href="{% url 'get_generated_file' %}">click here</a>.
+  </p>
 </div>
+<div></div>
 {% endblock content %}

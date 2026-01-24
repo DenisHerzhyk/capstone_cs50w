@@ -3,9 +3,10 @@ from fpdf import FPDF
 import os
 from django.conf import settings
 from PIL import Image
+from .models import File
+import uuid
 
 ALLOWED_EXTENSIONS = ['tiff', 'tif', 'pdf', 'png']
-pdf_path = None
 
 @shared_task
 def convert_images_to_pdf_task(file_paths):
@@ -18,16 +19,14 @@ def convert_images_to_pdf_task(file_paths):
         pdf.add_page()
         pdf.image(file_path, x=10, y=10, w=190)
 
-    pdf_output_path = os.path.join(settings.MEDIA_ROOT, 'pdfs', 'output.pdf')
+    filename = f"{uuid.uuid4()}.pdf"
+    pdf_output_path = os.path.join(settings.MEDIA_ROOT, 'pdfs', filename)
     os.makedirs(os.path.dirname(pdf_output_path), exist_ok=True)
     pdf.output(pdf_output_path)
-    pdf_path = pdf_output_path
+    File.objects.create(content_type="application/pdf", file_type="extracted", file_format=pdf_output_path.split('.')[-1], file_name=filename, file_location=pdf_output_path)
+
     return pdf_output_path
     
-
-# @shared_task
-# def edit_pdf_task(file_paths):
-
 
 @shared_task
 def convert_images_to_tiff_task(file_paths):
@@ -55,6 +54,8 @@ def convert_to_tiff(file_paths, output_path):
         append_images=imgs[1:]
     )
 
+    File.objects.create(content_type="image/tiff", file_type="extracted", file_format="tiff", file_name=os.path.basename(output_path), file_location=output_path)
+
     return output_path
 
 def convert_to_png(file_paths, output_paths):
@@ -66,5 +67,8 @@ def convert_to_png(file_paths, output_paths):
         out = os.path.join(output_paths, f"output_{i}.png")
         im.save(out, "PNG")
         outputs.append(out)
+
+        ext = os.path.splitext(out)[1].lstrip(".")
+        File.objects.create(content_type="image/png", file_type="extracted", file_format="png", file_name=os.path.basename(out), file_location=out)
 
     return outputs

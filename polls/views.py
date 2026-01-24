@@ -9,6 +9,8 @@ import language_tool_python
 import re
 from pypdf import PdfReader
 from PIL import Image
+from .models import File
+from .models import TextInput
 
 tool = language_tool_python.LanguageTool('en-US')
 
@@ -26,25 +28,6 @@ def file_generation_in_progress(request):
 
 def get_text_cleaner(request):
     return render(request, 'polls/text_cleaner.html')
-
-def upload_edit(request):
-    files = request.FILES.getList('files[]')
-    result = []
-
-    for f in files:
-        if f.content_type == 'application/pdf':
-            reader = PdfReader(f)
-            pages = len(reader.pages)
-    
-        else:
-            im = Image.open(f)
-            pages = im.n_frames
-
-        result.append({
-            "name": f.name,
-            "pages": pages
-        })
-    return JsonResponse({'files': result})
 
 def upload_images(request):
     if request.method == "POST":
@@ -66,6 +49,8 @@ def upload_images(request):
                 for chunk in file.chunks():
                     destination.write(chunk)
 
+            ext = os.path.splitext(file.name)[1].lower().lstrip(".")
+            File.objects.create(content_type=file.content_type, file_type="attached", file_format=ext, file_name=file.name, file_location=file_path)
             file_paths.append(file_path)
 
         if action == 'generate-pdf':    
@@ -109,8 +94,6 @@ def get_generated_file(request):
 
     return render(request, 'polls/file_generation_in_progress.html')
     
-    # return render(request, 'polls/edit_pdf.html')
-
 #clean text
 def clean_text(request):
     if request.method == 'POST':
@@ -135,7 +118,7 @@ def clean_text(request):
         #grammar correction
         matches = tool.check(cleaned_text)
         correct_text = language_tool_python.utils.correct(cleaned_text, matches)
-
+        TextInput.objects.create(text_content=correct_text)
         return JsonResponse({'result': True, 'correct_text': correct_text})
     return JsonResponse({
         'result': False,

@@ -75,19 +75,24 @@ The project is complex due to:
 ### Package JSON
 ```bash
 npm install
+```
 
 ### Redis
 ```bash
 redis-server --port 6380 --bind 127.0.0.1
+```
 
 ### Celery
 ```bash
 celery -A mysite.celery_app worker --loglevel=info
+```
 
 ### Django
 ```bash
 python manage.py runserver
+```
 
 ##Tailwind
 ```bash
 npx tailwindcss -i ./static/css/input.css -o ./static/css/output.css --watch
+```
